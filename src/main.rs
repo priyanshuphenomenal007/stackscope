@@ -99,14 +99,26 @@ fn main() {
     }
 }
 
+fn classify_elf_error(err: &impl std::fmt::Display) -> ExitCode {
+    let err_str = err.to_string();
+
+    if err_str.contains("Unsupported architecture") {
+        ExitCode::UnsupportedArchitecture
+    } else {
+        ExitCode::ElfParseFailure
+    }
+}
+
 fn run_analyze(elf: &str, entry: &str, budget: usize, format: Format) {
     let elf_path = Path::new(elf);
 
     let graph = match load_elf(elf_path) {
         Ok(graph) => graph,
+
         Err(err) => {
             eprintln!("ELF ingestion failed: {}", err);
-            process::exit(ExitCode::ElfParseFailure as i32);
+
+            process::exit(classify_elf_error(&err) as i32);
         }
     };
 
@@ -117,8 +129,10 @@ fn run_analyze(elf: &str, entry: &str, budget: usize, format: Format) {
 
     let entry_idx = match entry_node {
         Some(idx) => idx,
+
         None => {
             eprintln!("Entry point '{}' not found.", entry);
+
             process::exit(ExitCode::EntryNotFound as i32);
         }
     };
@@ -149,7 +163,6 @@ fn run_analyze(elf: &str, entry: &str, budget: usize, format: Format) {
                     )
                 };
 
-                // Map the critical path into SARIF locations
                 let locations: Vec<_> = result
                     .critical_path
                     .iter()
@@ -235,17 +248,21 @@ fn run_analyze(elf: &str, entry: &str, budget: usize, format: Format) {
 fn run_diff(baseline: &str, candidate: &str, entry: &str, format: Format) {
     let baseline_graph = match load_elf(Path::new(baseline)) {
         Ok(graph) => graph,
+
         Err(err) => {
             eprintln!("Baseline ELF failed: {}", err);
-            process::exit(ExitCode::ElfParseFailure as i32);
+
+            process::exit(classify_elf_error(&err) as i32);
         }
     };
 
     let candidate_graph = match load_elf(Path::new(candidate)) {
         Ok(graph) => graph,
+
         Err(err) => {
             eprintln!("Candidate ELF failed: {}", err);
-            process::exit(ExitCode::ElfParseFailure as i32);
+
+            process::exit(classify_elf_error(&err) as i32);
         }
     };
 
@@ -261,16 +278,20 @@ fn run_diff(baseline: &str, candidate: &str, entry: &str, format: Format) {
 
     let baseline_entry = match baseline_entry {
         Some(idx) => idx,
+
         None => {
             eprintln!("Baseline entry '{}' not found.", entry);
+
             process::exit(ExitCode::EntryNotFound as i32);
         }
     };
 
     let candidate_entry = match candidate_entry {
         Some(idx) => idx,
+
         None => {
             eprintln!("Candidate entry '{}' not found.", entry);
+
             process::exit(ExitCode::EntryNotFound as i32);
         }
     };
@@ -281,12 +302,18 @@ fn run_diff(baseline: &str, candidate: &str, entry: &str, format: Format) {
 
     let diff = WcsdDiffResult {
         baseline_depth_bytes: baseline_result.max_depth_bytes,
+
         candidate_depth_bytes: candidate_result.max_depth_bytes,
+
         stack_delta_bytes: candidate_result.max_depth_bytes as isize
             - baseline_result.max_depth_bytes as isize,
+
         baseline_unbounded: baseline_result.is_unbounded,
+
         candidate_unbounded: candidate_result.is_unbounded,
+
         new_recursion_introduced: !baseline_result.is_unbounded && candidate_result.is_unbounded,
+
         candidate_critical_path: candidate_result.critical_path.clone(),
     };
 
@@ -374,8 +401,11 @@ fn run_diff(baseline: &str, candidate: &str, entry: &str, format: Format) {
 
         Format::Text => {
             println!("=== Stack Regression Analysis ===");
+
             println!("Baseline Depth: {} bytes", diff.baseline_depth_bytes);
+
             println!("Candidate Depth: {} bytes", diff.candidate_depth_bytes);
+
             println!("Stack Delta: {} bytes", diff.stack_delta_bytes);
 
             if diff.new_recursion_introduced {

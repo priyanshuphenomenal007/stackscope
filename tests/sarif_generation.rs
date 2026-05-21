@@ -4,24 +4,12 @@ use std::process::Command;
 fn generates_sarif_output() {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
 
-    let elf_path = format!(
-        "{}/fixtures/cortex_m_target/target.elf",
-        manifest_dir
-    );
+    let elf_path = format!("{}/fixtures/cortex_m_target/target.elf", manifest_dir);
 
     let output = Command::new("cargo")
         .args([
-            "run",
-            "--",
-            "analyze",
-            "--elf",
-            &elf_path,
-            "--entry",
-            "main",
-            "--budget",
-            "100",
-            "--format",
-            "sarif",
+            "run", "--", "analyze", "--elf", &elf_path, "--entry", "main", "--budget", "100",
+            "--format", "sarif",
         ])
         .output()
         .expect("failed to execute StackScope");

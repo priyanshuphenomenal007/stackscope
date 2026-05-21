@@ -2,10 +2,10 @@ name: StackScope CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   analyze:
@@ -20,17 +20,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build StackScope Docker Image
+      - name: Build StackScope Docker image
         run: |
           docker build \
             -t stackscope-action \
             . \
             -f .github/actions/stackscope/Dockerfile
 
-      - name: Run StackScope Analysis
+      - name: Run StackScope analysis
         id: stackscope
         continue-on-error: true
-
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
@@ -41,20 +40,21 @@ jobs:
             100 \
             sarif
 
-      - name: Verify SARIF output exists
-        run: |
-          ls -lah
-          test -f stackscope-result.sarif
+      - name: Upload SARIF artifact
+        uses: actions/upload-artifact@v4
 
-      - name: Upload SARIF report
+        with:
+          name: stackscope-sarif
+          path: stackscope-result.sarif
+
+      - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
 
         with:
           sarif_file: stackscope-result.sarif
 
-      - name: Enforce Policy Exit Code
+      - name: Enforce policy result
         if: steps.stackscope.outcome == 'failure'
-
         run: |
-          echo "❌ StackScope policy violation detected."
+          echo "StackScope policy violation detected."
           exit 1

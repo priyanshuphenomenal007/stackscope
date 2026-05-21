@@ -1,0 +1,5 @@
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/os/cbprintf_packaged.c:245:5:cbvprintf_package	104	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/os/cbprintf_packaged.c:831:5:cbprintf_package	28	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/os/cbprintf_packaged.c:843:5:cbpprintf_external	32	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/os/cbprintf_packaged.c:898:6:is_ptr	12	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/os/cbprintf_packaged.c:925:5:cbprintf_package_convert	120	static

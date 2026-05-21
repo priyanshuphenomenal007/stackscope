@@ -1,0 +1,2 @@
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/libc/picolibc/cbprintf.c:15:12:cbputc	8	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/lib/libc/picolibc/cbprintf.c:23:5:cbvprintf	48	static

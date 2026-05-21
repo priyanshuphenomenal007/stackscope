@@ -1,0 +1,3 @@
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/modules/lib/picolibc/newlib/libc/tinystdio/ultoa_invert.c:132:1:__ultoa_invert	32	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/modules/lib/picolibc/newlib/libc/tinystdio/vfprintf.c:344:1:skip_to_arg	24	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/zephyr/build/modules/picolibc/picolibc/include/wchar.h:161:10:vfwprintf	216	static

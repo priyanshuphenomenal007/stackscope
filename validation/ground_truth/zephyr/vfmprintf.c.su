@@ -1,0 +1,2 @@
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/modules/lib/picolibc/newlib/libc/tinystdio/ultoa_invert.c:132:1:__ultoa_invert	20	static
+/home/priyanshu/projects/vcp_candidate_22/validation/firmware/modules/lib/picolibc/newlib/libc/tinystdio/vfprintf.c:508:5:__m_vfprintf	56	static

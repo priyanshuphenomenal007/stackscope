@@ -28,8 +28,6 @@ jobs:
             -f .github/actions/stackscope/Dockerfile
 
       - name: Run StackScope analysis
-        id: stackscope
-        continue-on-error: true
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
@@ -40,21 +38,24 @@ jobs:
             100 \
             sarif
 
+      - name: Validate SARIF file exists
+        run: |
+          test -f stackscope-result.sarif
+
       - name: Upload SARIF artifact
         uses: actions/upload-artifact@v4
-
         with:
           name: stackscope-sarif
           path: stackscope-result.sarif
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
-
         with:
           sarif_file: stackscope-result.sarif
 
-      - name: Enforce policy result
-        if: steps.stackscope.outcome == 'failure'
+      - name: Enforce policy violations
         run: |
-          echo "StackScope policy violation detected."
-          exit 1
+          if grep -q '"level": "error"' stackscope-result.sarif; then
+            echo "StackScope policy violation detected."
+            exit 1
+          fi

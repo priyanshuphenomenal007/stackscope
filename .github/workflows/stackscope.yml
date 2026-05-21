@@ -20,26 +20,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Validate the reusable local GitHub Action
+      - name: Build StackScope Docker Image
+        run: |
+          docker build \
+            -t stackscope-action \
+            . \
+            -f .github/actions/stackscope/Dockerfile
+
       - name: Run StackScope Analysis
         id: stackscope
         continue-on-error: true
 
-        uses: ./.github/actions/stackscope
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            stackscope-action \
+            fixtures/cortex_m_target/target.elf \
+            main \
+            100 \
+            sarif
 
-        with:
-          elf: fixtures/cortex_m_target/target.elf
-          entry: main
-          budget: 100
-          format: sarif
-
-      - name: Verify SARIF file exists
+      - name: Verify SARIF output exists
         run: |
           ls -lah
           test -f stackscope-result.sarif
 
       - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
 
         with:
           sarif_file: stackscope-result.sarif

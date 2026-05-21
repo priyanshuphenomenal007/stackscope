@@ -3,14 +3,14 @@ name: StackScope CI
 on:
   push:
     branches: [ "main" ]
+
   pull_request:
     branches: [ "main" ]
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    
-    # Required permissions for GitHub Security tab ingestion
+
     permissions:
       security-events: write
       actions: read
@@ -20,33 +20,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build StackScope Docker Image
-        run: |
-          docker build \
-            -t stackscope-action \
-            . \
-            -f .github/actions/stackscope/Dockerfile
-
+      # Validate the reusable local GitHub Action
       - name: Run StackScope Analysis
         id: stackscope
         continue-on-error: true
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            stackscope-action \
-            fixtures/cortex_m_target/target.elf \
-            main \
-            100 \
-            sarif
 
-      - name: Upload SARIF report to GitHub Security
+        uses: ./.github/actions/stackscope
+
+        with:
+          elf: fixtures/cortex_m_target/target.elf
+          entry: main
+          budget: 100
+          format: sarif
+
+      - name: Verify SARIF file exists
+        run: |
+          ls -lah
+          test -f stackscope-result.sarif
+
+      - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v3
+
         with:
           sarif_file: stackscope-result.sarif
 
       - name: Enforce Policy Exit Code
         if: steps.stackscope.outcome == 'failure'
+
         run: |
-          echo "❌ StackScope policy violation detected. Check GitHub PR annotations."
+          echo "❌ StackScope policy violation detected."
           exit 1

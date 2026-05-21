@@ -1,0 +1,40 @@
+name: "StackScope Firmware Analysis"
+
+description: "Worst-case stack depth analysis for embedded firmware"
+
+author: "StackScope"
+
+inputs:
+  elf:
+    description: "Path to ELF binary"
+    required: true
+
+  entry:
+    description: "Entry point symbol"
+    required: false
+    default: "main"
+
+  budget:
+    description: "Maximum stack budget in bytes"
+    required: false
+    default: "4096"
+
+  format:
+    description: "Output format"
+    required: false
+    default: "sarif"
+
+outputs:
+  report_file:
+    description: "Generated report file"
+
+runs:
+  using: "docker"
+
+  image: "Dockerfile"
+
+  args:
+    - ${{ inputs.elf }}
+    - ${{ inputs.entry }}
+    - ${{ inputs.budget }}
+    - ${{ inputs.format }}

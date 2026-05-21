@@ -1,0 +1,14 @@
+# Rust
+/target/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated artifacts
+*.sarif
